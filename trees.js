@@ -20,8 +20,8 @@ module.exports = function() {
 // Implement a BST with insert and delete functions
 var BSTnode = function(data, parent, side){
     this.data = data;
-    this.parent = parent;
-    this.side = side;
+    this.parent = parent || null;
+    this.side = side || "root";
     this.left = null; // Another node, explicitly <= to this
     this.right = null; // Another node, explicitly >= to this
     return this;
@@ -92,14 +92,59 @@ BSTnode.prototype = {
         if(!node){
             return false;
         }
+        if(this === node){ // Handles root case
+            if(!this.left && !this.right){
+                this.data = undefined;
+                return "No Children";
+            }
+            if(this.left && this.right){
+                var min = this.right.min();
+                min.parent[min.side] = min.right; // Disconnect min and connect min's right branch
+                if(min.right){
+                    min.right.side = min.side;
+                    min.right.parent = min.parent;
+                }
+                this.data = min.data;
+                return "Two children";
+            }
+            if(this.left) {
+                this.data = this.left.data;
+                this.right = this.left.right;
+                this.left = this.left.left;
+                if(this.left){
+                    this.left.side = "left";
+                }
+                if(this.right){
+                    this.right.side = "right";
+                }
+                return "Left child";
+            }
+            if(this.right) {
+                this.data = this.right.data;
+                this.left = this.right.left;
+                this.right = this.right.right;
+                if(this.left){
+                    this.left.side = "left";
+                }
+                if(this.right){
+                    this.right.side = "right";
+                }
+                return "Right child";
+            }
+            return "How did I get here?!";
+        }
         if(!node.left && !node.right){
             node.parent[node.side] = null;
             return "No Children";
         }
         if(node.left && node.right){
-            var min = node.right.min;
+            var min = node.right.min();
             node.parent[node.side] = min;
-            min.parent[min.side] = null; // Clear reference to minimum
+            min.parent[min.side] = min.right; // Clear reference to minimum
+            if(min.right){
+                min.right.side = min.side;
+                min.right.parent = min.parent;
+            }
             min.parent = node.parent; // Give minimum parent reference
             min.left = node.left; // Give minimum child left reference
             min.right = node.right // Give minimum child right reference
@@ -108,14 +153,17 @@ BSTnode.prototype = {
         if(node.left) {
             node.parent[node.side] = node.left;
             node.left.parent = node.parent;
+            node.left.side = node.side;
             return "Left child";
         }
         if(node.right) {
-            node.parent[node.side] = node.right;
+            // console.log(node);
+            node.right.side = node.side;
             node.right.parent = node.parent;
+            node.parent[node.side] = node.right;
             return "Right child";
         }
-
+        return "How did I get here?!";
     },
     // Print a tree using BFS and DFS
     printBreadth: function() {
@@ -160,6 +208,14 @@ function testBST() {
              3       10
                   8     11
     */
+    console.log(root.printBreadth());
+    console.log(root.printDepth());
+    // console.log(root.delete(2));
+    // console.log(root.delete(3));
+    console.log(root.delete(5));
+    console.log(root.delete(7));
+    console.log(root.delete(8));
+    console.log(root.delete(11));
     console.log(root.printBreadth());
     console.log(root.printDepth());
 }
