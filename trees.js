@@ -1,6 +1,5 @@
 /* TODO
 Write a function that determines if a tree is a BST
-Find the smallest element in a BST
 Find the 2nd largest number in a BST
 Given a binary tree which is a sum tree (child nodes add to parent), write an algorithm to determine whether the tree is a valid sum tree
 Find the distance between 2 nodes in a BST and a normal binary tree
@@ -54,6 +53,8 @@ BSTnode.prototype = {
         console.log("How did we get here?");
         return false;
     },
+    
+    //Find the smallest element in a BST
     min: function(){
         if(this.left){
             return this.left.min();
